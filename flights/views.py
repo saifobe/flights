@@ -69,18 +69,29 @@ class WeatherList(APIView):
             return Response(queryset.values())
         else:
             response = requests.get(
-            f"https://api.openweathermap.org/data/2.5/weather?lat=${event.location_y}&lon=${event.location_x}&appid=f22892654725839a44ff6db985f0b151",
+            f"https://api.openweathermap.org/data/2.5/weather?lat={event.location_y}&lon={event.location_x}&appid=f22892654725839a44ff6db985f0b151",
             )
-
-            api_data = response.json() 
-            weather = Weather(
-            id = event,
-            humidity = api_data['main']['humidity'],
-            temperature = api_data['main']['temp'],
-            )
-            weather.save()
             
-            return Response(Weather.objects.filter(id=request.GET.get('id')))
+
+            api_data = response.json()
+
+            humidity = api_data.get("main", {}).get("humidity")
+            temperature = api_data.get("main", {}).get("temp")
+
+            if humidity is not None and temperature is not None:
+                weather = Weather(
+                    id=event,
+                    humidity=humidity,
+                    temperature=temperature,
+                )
+                weather.save()
+                return Response(
+                    Weather.objects.filter(id=request.GET.get("id")).values()
+                )
+            else:
+                return Response({"message": "Failed to retrieve weather data"})
+            
+            
 
 class FlightList(APIView):
 
