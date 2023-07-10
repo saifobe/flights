@@ -23,7 +23,13 @@ class Weather(models.Model):
     temperature = models.IntegerField(max_length=100)
     created_at = models.DateTimeField(default=datetime.now)
 
-
+class Flight(models.Model):
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    airport_code = models.CharField(max_length=100)
+    flight_number = models.CharField(max_length=100)
+    departure_time = models.DateTimeField()
+    arrival_time = models.DateTimeField()
+    created_at = models.DateTimeField(default=datetime.now)
 
 
     
